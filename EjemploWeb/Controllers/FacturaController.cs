@@ -6,6 +6,7 @@ using EjemploWeb.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace EjemploWeb.Controllers
 {
@@ -31,13 +32,11 @@ namespace EjemploWeb.Controllers
             }
         }
 
-
-        // GET: api/Factura
         [HttpGet]
-        public IEnumerable<Factura> Get()
+        public IEnumerable<Factura> GetByDate()
         {
             //return _context.Facturas.ToList();
-            return _context.Facturas.Include(t=>t.Detalles).Include(t=>t.Cliente).ToList();
+            return _context.Facturas.Include(t => t.Detalles).Include(t => t.Cliente).ToList();
         }
 
         // POST: api/Factura
@@ -48,7 +47,31 @@ namespace EjemploWeb.Controllers
             _context.SaveChanges();
         }
 
+        // Ejemplo 2 Recepcion de Fecha en Objeto
+        // GET: api/Factura
+        [HttpPost]
+        [Route("QueryDate")]
+        public ActionResult<QueryFacturasResponse> PostQuery(QueryFacturasRequest request)
+        {
+            if (request.Fecha.Month < DateTime.Now.Month) {
+                return BadRequest("Error");
+            }
+            return new QueryFacturasResponse { Fecha = request.Fecha.ToLongDateString() };
+        }
+
+
+
 
         
+    }
+    public class QueryFacturasResponse
+    {
+        [JsonProperty("fecha")]
+        public string Fecha { get; set; }
+    }
+
+    public class QueryFacturasRequest
+    {
+        public DateTime Fecha { get; set; }
     }
 }
