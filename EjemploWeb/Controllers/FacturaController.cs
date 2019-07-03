@@ -22,7 +22,11 @@ namespace EjemploWeb.Controllers
 
             if (_context.Facturas.Count()==0)
             {
-                _context.Facturas.Add(new Factura {  Nombre="Test", Detalles= new List<FacturaDetalle> { new FacturaDetalle { Nombre="Producto1" }, new FacturaDetalle { Nombre = "Producto2" } } });
+                Cliente cliente1 = new Cliente { Nombre = "Cliente1" };
+                _context.Clientes.Add(cliente1);
+                _context.SaveChanges();
+                _context.Facturas.Add(new Factura {  Nombre="Test", Cliente=cliente1, Detalles= new List<FacturaDetalle> { new FacturaDetalle { Nombre="Producto1" }, new FacturaDetalle { Nombre = "Producto2" } } });
+                _context.Facturas.Add(new Factura { Nombre = "Test2", Cliente = cliente1, Detalles = new List<FacturaDetalle> { new FacturaDetalle { Nombre = "Producto21" }, new FacturaDetalle { Nombre = "Producto22" } } });
                 _context.SaveChanges();
             }
         }
@@ -32,7 +36,8 @@ namespace EjemploWeb.Controllers
         [HttpGet]
         public IEnumerable<Factura> Get()
         {
-            return _context.Facturas.Include(t=>t.Detalles).ToList();
+            //return _context.Facturas.ToList();
+            return _context.Facturas.Include(t=>t.Detalles).Include(t=>t.Cliente).ToList();
         }
 
         // POST: api/Factura
